@@ -8,7 +8,7 @@
  * For more information on global stylesheets, visit the documentation:
  * https://ionicframework.com/docs/layout/global-stylesheets
  */
-
+ 
 /* Core CSS required for Ionic components to work properly */
 @import "~@ionic/angular/css/core.css";
 
@@ -24,3 +24,85 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+
+.my-custom-class{
+    --spinner-color:var(--ion-color-rojooscuro);
+    color: aliceblue;
+  }
+
+ion-card-content{
+  color:var(--ion-color-blanquito)
+}
+ion-card-header{
+  color:var(--ion-color-blanquito)
+}
+
+ion-select{
+  --placeholder-color: #971e49;
+}
+
+.colorText{
+  text-decoration-color: red;
+}
+
+ion-text{
+  color:#1e2023
+}
+
+ion-refresher-content{
+  color:#A42B36
+}
+
+/* This only changes this particular animation duration */
+@-webkit-keyframes pulse {
+  from {
+    -webkit-transform: scale3d(1, 1, 1);
+    transform: scale3d(1, 1, 1);
+  }
+
+  50% {
+    -webkit-transform: scale3d(1.05, 1.05, 1.05);
+    transform: scale3d(1.05, 1.05, 1.05);
+  }
+
+  to {
+    -webkit-transform: scale3d(1, 1, 1);
+    transform: scale3d(1, 1, 1);
+  }
+}
+@keyframes pulse {
+  from {
+    -webkit-transform: scale3d(1, 1, 1);
+    transform: scale3d(1, 1, 1);
+  }
+
+  50% {
+    -webkit-transform: scale3d(1.05, 1.05, 1.05);
+    transform: scale3d(1.05, 1.05, 1.05);
+  }
+
+  to {
+    -webkit-transform: scale3d(1, 1, 1);
+    transform: scale3d(1, 1, 1);
+  }
+}
+.animate__pulse {
+  -webkit-animation-name: pulse;
+  animation-name: pulse;
+  -webkit-animation-timing-function: ease-in-out;
+  animation-timing-function: ease-in-out;
+}
+
+ion-checkbox {
+  background: #ffffff;
+  border-width: 3px !important;
+  border-style: solid !important;
+  border-radius: 20px;
+  border-color: rgb(47, 47, 47) !important;
+  --height: 35px;
+  --width: 35px;
+  --checkmark-color: #4870f2;
+  --background-checked: #324ff1;
+  --border-color: #363535;
+  --border-color-checked: #1139ec;
+}
