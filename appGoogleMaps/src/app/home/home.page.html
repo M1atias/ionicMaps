@@ -50,6 +50,23 @@
               </ion-list>
           </ion-col>
       </ion-row>
+      <!-- Producto a Buscar -->
+      <ion-card>
+          <ion-card-header>
+              Ingrese Producto a Buscar
+          </ion-card-header>
+          <form [formGroup]="productoBuscar" (ngSubmit)="submit()">
+            <ion-item>
+                <ion-label position="floating">Producto</ion-label>
+                <ion-input formControlName="nombreProducto" [(ngModel)]= "productoB"></ion-input>
+                <div *ngFor="let error of errorMessages.nombreProducto">
+                    <ng-container *ngIf="nombreProducto.hasError(error.type) && (nombreProducto.dirty || nombreProducto.touched)">
+                        <small class="error-message">{{error.message}}</small>
+                    </ng-container>
+                </div>
+            </ion-item>
+          </form>
+      </ion-card>
 
       <!-- Domicilio de entrega -->
       <ion-card>

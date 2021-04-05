@@ -45,6 +45,7 @@ export class HomePage implements OnInit {
   producto = [];
   comercio;
   FormReg: FormGroup;
+  productoB: String
 
   //Formulario del domicilio
   createFormGroupDomicilio() {
@@ -66,6 +67,13 @@ export class HomePage implements OnInit {
   }
   metodoPagoEfectivo: FormGroup;
 
+  createFormGroupProducto(){
+    return new FormGroup({
+      nombreProducto: new FormControl('',[Validators.required,Validators.maxLength(50), Validators.minLength(5),Validators.pattern(/^[-a-zA-Z0-9' 'ñÑ]{1,100}$/)])
+    });
+  }
+  productoBuscar: FormGroup;
+
   //Metodo de pago tarjeta
   createFormGroupMetodoPagoTarjeta() {
     return new FormGroup({
@@ -86,6 +94,7 @@ export class HomePage implements OnInit {
     this.domicilio = this.createFormGroupDomicilio();
     this.metodoPagoEfectivo = this.createFormGroupMetodoPagoEfectivo();
     this.metodoPagoTarjeta = this.createFormGroupMetodoPagoTarjeta();
+    this.productoBuscar = this.createFormGroupProducto();
   }
 
   async presentLoading() {
@@ -100,6 +109,11 @@ export class HomePage implements OnInit {
   resetearFormularioDomicilio(){
     this.domicilio.reset();
   }
+
+  resetearFormularioProducto(){
+    this.productoBuscar.reset();
+  }
+
   //Domicilio - metodo de pago
   resetearFormularioPago() {
     this.metodoPagoEfectivo.reset();
@@ -141,6 +155,10 @@ export class HomePage implements OnInit {
   }
   get codSeguridad() {
     return this.metodoPagoTarjeta.get('codSeguridad');
+  }
+
+  get nombreProducto(){
+    return this.productoBuscar.get('nombreProducto');
   }
 
 
@@ -195,6 +213,12 @@ export class HomePage implements OnInit {
       { type: 'required', message: 'Se requiere el código de seguridad de la tarjeta' },
       { type: 'pattern', message: 'El patron del codigo de la tarjeta es de 3 caracteres' }
     ],
+    nombreProducto:[
+      { type: 'required', message: 'Se requiere el nombre del producto' },
+      { type: 'maxlength', message: 'El nombre del producto no puede ser mayor a 50 caracteres' },
+      { type: 'minlength', message: 'El nombre del producto debe tener como mínimo 5 caracteres' },
+      { type: 'pattern', message: 'El nombre del producto ingresado no es valido' }
+    ]
 
   };
 
@@ -506,6 +530,7 @@ verificarHora(hora:Date) {
     this.selectorTarjetaVisible = false; 
     this.numeroTarjetaVISA=null;
     this.titularTarjeta = null;
+    this.productoB= "     ";
   }
   validarRecarga(){
     if (this.precio > 0 && (this.limpiarValore >= this.precio.toString() || this.selectorTarjetaVisible) &&(this.metodoPagoTarjeta.valid || this.metodoPagoEfectivo.valid) && this.domicilio.valid && this.ciudadSeleccionada !== "  " && this.nombreCalle !== "     " && this.numeroCalle !== "   "  && this.limpiarValore !== " ") {
