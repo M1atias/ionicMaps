@@ -4,7 +4,8 @@ import { ProductoService } from '../services/producto.service';
 import { FormControl } from '@angular/forms';
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { LoadingController, NavController } from '@ionic/angular';
-  
+import { Camera} from '@ionic-native/camera/ngx';
+
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -45,7 +46,8 @@ export class HomePage implements OnInit {
   producto = [];
   comercio;
   FormReg: FormGroup;
-  productoB: String
+  productoB: String;
+  imgURL;
 
   //Formulario del domicilio
   createFormGroupDomicilio() {
@@ -90,7 +92,8 @@ export class HomePage implements OnInit {
     private homeService: HomeService,
     private loadingCtrl:LoadingController,
     private productoService: ProductoService,
-    private navCtc: NavController) {
+    private navCtc: NavController,
+    private camera:Camera) {
     this.domicilio = this.createFormGroupDomicilio();
     this.metodoPagoEfectivo = this.createFormGroupMetodoPagoEfectivo();
     this.metodoPagoTarjeta = this.createFormGroupMetodoPagoTarjeta();
@@ -231,6 +234,27 @@ export class HomePage implements OnInit {
     }
   }
 
+  getCamera(){
+    this.camera.getPicture({
+      sourceType:this.camera.PictureSourceType.CAMERA,
+      destinationType: this.camera.DestinationType.FILE_URI
+    }).then((res)=>{
+      this.imgURL  = res;
+    }).catch(e =>{
+      console.log(e)
+    })
+  }
+
+  getGallery(){
+    this.camera.getPicture({
+      sourceType:this.camera.PictureSourceType.PHOTOLIBRARY,
+      destinationType: this.camera.DestinationType.DATA_URL
+    }).then((res)=>{
+      this.imgURL  = 'data:image/jpeg;base64,' + res;
+    }).catch(e =>{
+      console.log(e)
+    })
+  }
   recargarPagina(){
     this.comercio = this.homeService.getComercios();
     this.producto = this.productoService.getProductos(this.comercio.id);
