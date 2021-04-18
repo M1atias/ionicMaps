@@ -6,13 +6,14 @@ import { RouteReuseStrategy } from '@angular/router';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
-import { Camera} from '@ionic-native/camera/ngx';
+//import { Camera} from '@ionic-native/camera/ngx';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { BackendModule } from './backend/backend.module';
-
+import {Chooser} from '@ionic-native/chooser/ngx';
+//import {ImagePicker} from '@ionic-native/image-picker/ngx';
 
 @NgModule({
   declarations: [AppComponent],
@@ -22,8 +23,10 @@ import { BackendModule } from './backend/backend.module';
   providers: [
     StatusBar,
     SplashScreen,
-    Camera,
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
+    //Camera,
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    Chooser,
+    //ImagePicker
   ],
   bootstrap: [AppComponent]
 })

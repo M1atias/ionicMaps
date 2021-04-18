@@ -4,8 +4,11 @@ import { ProductoService } from '../services/producto.service';
 import { FormControl } from '@angular/forms';
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { LoadingController, NavController } from '@ionic/angular';
-import { Camera} from '@ionic-native/camera/ngx';
+//import { Camera} from '@ionic-native/camera/ngx';
 import { DomSanitizer } from '@angular/platform-browser';
+import {Chooser, ChooserResult} from '@ionic-native/chooser/ngx';
+//import {ImagePicker,ImagePickerOptions} from '@ionic-native/image-picker/ngx';
+
 
 @Component({
   selector: 'app-home',
@@ -51,8 +54,11 @@ export class HomePage implements OnInit {
   imgURL;
   archivos:any=[];
   previsualizar:string;
-  imagenSize:boolean = false;
-  validacionImgSize:string;
+  imgValidation:boolean = false;
+  validacionImg:string;
+  fileObj:ChooserResult;
+  mostrarImg:string="";
+  images:any[]=[];
 
   //Formulario del domicilio
   createFormGroupDomicilio() {
@@ -98,8 +104,10 @@ export class HomePage implements OnInit {
     private loadingCtrl:LoadingController,
     private productoService: ProductoService,
     private navCtc: NavController,
-    private camera:Camera,
-    private sanitizer:DomSanitizer) {
+    private sanitizer:DomSanitizer,
+    private chooser:Chooser,
+    //private picker:ImagePicker
+    ) {
     this.domicilio = this.createFormGroupDomicilio();
     this.metodoPagoEfectivo = this.createFormGroupMetodoPagoEfectivo();
     this.metodoPagoTarjeta = this.createFormGroupMetodoPagoTarjeta();
@@ -238,9 +246,16 @@ export class HomePage implements OnInit {
       this.recargarPagina();
       this.banderaCargaPantalla = true;
     }
+    /*this.picker.hasReadPermission().then((val)=>{
+      if(val === false){
+        this.picker.requestReadPermission();
+      }
+    },(err)=>{
+      this.picker.requestReadPermission();
+    })*/
   }
 
-  getCamera(){
+  /*getCamera(){
     this.camera.getPicture({
       sourceType:this.camera.PictureSourceType.CAMERA,
       destinationType: this.camera.DestinationType.FILE_URI
@@ -249,9 +264,9 @@ export class HomePage implements OnInit {
     }).catch(e =>{
       console.log(e)
     })
-  }
+  }*/
 
-  getGallery(){
+  /*getGallery(){
     this.camera.getPicture({
       sourceType:this.camera.PictureSourceType.PHOTOLIBRARY,
       destinationType: this.camera.DestinationType.DATA_URL
@@ -260,20 +275,34 @@ export class HomePage implements OnInit {
     }).catch(e =>{
       console.log(e)
     })
-  }
+  }*/
 
   capturarFoto(evento):any{
+    this.previsualizar = "";
     const extensionArchivo = evento.target.files[0].type;
-    const sizeArchivo = evento
+    const sizeArchivo = evento.target.files[0].size;
     const archivoCapturado =  evento.target.files[0];
-    this.extraerBase4(archivoCapturado).then((imagen:any) =>{
-      this.previsualizar = imagen.base;
-      console.log(imagen);
-    })
-    //this.archivos.push(archivoCapturado);
-    console.log(evento.target.files);
-    //console.log(evento.target.files.type);
-    console.log(extensionArchivo);
+    if (extensionArchivo === "image/jpeg" ||extensionArchivo === "image/jpg") {
+      this.imgValidation = false;
+      if (sizeArchivo <= 5000000) {
+        this.imgValidation = false;
+        this.extraerBase4(archivoCapturado).then((imagen:any) =>{
+          this.previsualizar = imagen.base;
+          console.log(imagen);
+        })
+        //this.archivos.push(archivoCapturado);
+        console.log(evento.target.files);
+        //console.log(evento.target.files.type);
+        console.log(extensionArchivo);
+      } else {
+        this.imgValidation = true;
+        this.validacionImg = "El tamaño del archivo supera los 5 mb";
+      }
+    }
+    else{
+      this.imgValidation = true;
+      this.validacionImg = "Debe seleccionar un archivo '.jpg'";
+    }
   }
 
   extraerBase4 = async ($event:any) => new Promise((resolve, reject)=>{
@@ -298,6 +327,52 @@ export class HomePage implements OnInit {
     }
   })
 
+  pickFile(){
+    this.chooser.getFile("image/jpeg").then((value:ChooserResult)=>{
+      this.fileObj = value;
+      this.mostrarImg = "";
+      const text3 = JSON.stringify(this.fileObj.mediaType);
+      const text4 = JSON.stringify(this.fileObj.name);
+      const text5 = JSON.stringify(this.fileObj.uri);
+      let blob = new Blob([this.fileObj.data],{type:"image/jpeg"});
+      const text6 = "blob size=" + blob.size;
+      
+      console.log(text3+text4+text5,text6);
+      alert(text3+text4+text5+text6);
+      if (blob.type === "image/jpeg" || blob.type === "image/jpg") {
+        this.imgValidation = false;
+        if (blob.size < 5000000) {
+          this.imgValidation = false;
+          this.mostrarImg = this.fileObj.dataURI;
+        }else{
+          this.imgValidation = true;
+          this.validacionImg = "El tamaño del archivo supera los 5 mb";
+        }
+      }else{
+        this.imgValidation = true;
+        this.validacionImg = "Debe seleccionar un archivo '.jpg'";
+      }
+    }),(err) =>{
+      console.log("error");
+    }
+  }
+/*
+  pickImage(){
+    let options:ImagePickerOptions={
+      maximumImagesCount:1,
+      outputType:1,
+      quality:5
+    }
+    this.picker.getPictures(options).then((res)=>{
+      for(var i = 0;i<res.length;i++){
+        let base64OfImage = "data:image/jpeg;base64," + res[i];
+        this.images.push(base64OfImage);
+      }
+    },(err)=>{
+        alert(JSON.stringify(err));
+    })
+  }
+*/
 
   recargarPagina(){
     this.comercio = this.homeService.getComercios();
