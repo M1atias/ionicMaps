@@ -5,6 +5,7 @@ import { FormControl } from '@angular/forms';
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { LoadingController, NavController } from '@ionic/angular';
 import { Camera} from '@ionic-native/camera/ngx';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-home',
@@ -48,6 +49,10 @@ export class HomePage implements OnInit {
   FormReg: FormGroup;
   productoB: String;
   imgURL;
+  archivos:any=[];
+  previsualizar:string;
+  imagenSize:boolean = false;
+  validacionImgSize:string;
 
   //Formulario del domicilio
   createFormGroupDomicilio() {
@@ -93,7 +98,8 @@ export class HomePage implements OnInit {
     private loadingCtrl:LoadingController,
     private productoService: ProductoService,
     private navCtc: NavController,
-    private camera:Camera) {
+    private camera:Camera,
+    private sanitizer:DomSanitizer) {
     this.domicilio = this.createFormGroupDomicilio();
     this.metodoPagoEfectivo = this.createFormGroupMetodoPagoEfectivo();
     this.metodoPagoTarjeta = this.createFormGroupMetodoPagoTarjeta();
@@ -255,6 +261,44 @@ export class HomePage implements OnInit {
       console.log(e)
     })
   }
+
+  capturarFoto(evento):any{
+    const extensionArchivo = evento.target.files[0].type;
+    const sizeArchivo = evento
+    const archivoCapturado =  evento.target.files[0];
+    this.extraerBase4(archivoCapturado).then((imagen:any) =>{
+      this.previsualizar = imagen.base;
+      console.log(imagen);
+    })
+    //this.archivos.push(archivoCapturado);
+    console.log(evento.target.files);
+    //console.log(evento.target.files.type);
+    console.log(extensionArchivo);
+  }
+
+  extraerBase4 = async ($event:any) => new Promise((resolve, reject)=>{
+    try{
+      const unsafeImg = window.URL.createObjectURL($event);
+      const image = this.sanitizer.bypassSecurityTrustUrl(unsafeImg);
+      const reader = new FileReader();
+      reader.readAsDataURL($event);
+      reader.onload = () =>{
+        resolve({
+          base:reader.result
+        });
+      };
+      reader.onerror = error =>{
+        resolve({
+          base:null
+        });
+      };
+      
+    } catch(e){
+      return null;
+    }
+  })
+
+
   recargarPagina(){
     this.comercio = this.homeService.getComercios();
     this.producto = this.productoService.getProductos(this.comercio.id);
