@@ -14,6 +14,7 @@ import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { BackendModule } from './backend/backend.module';
 import {Chooser} from '@ionic-native/chooser/ngx';
 //import {ImagePicker} from '@ionic-native/image-picker/ngx';
+import {Geolocation} from  '@ionic-native/geolocation/ngx';
 
 @NgModule({
   declarations: [AppComponent],
@@ -26,6 +27,7 @@ import {Chooser} from '@ionic-native/chooser/ngx';
     //Camera,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     Chooser,
+    Geolocation
     //ImagePicker
   ],
   bootstrap: [AppComponent]

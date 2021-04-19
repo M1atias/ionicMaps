@@ -8,7 +8,7 @@ import { LoadingController, NavController } from '@ionic/angular';
 import { DomSanitizer } from '@angular/platform-browser';
 import {Chooser, ChooserResult} from '@ionic-native/chooser/ngx';
 //import {ImagePicker,ImagePickerOptions} from '@ionic-native/image-picker/ngx';
-
+import {Geolocation, Geoposition} from  '@ionic-native/geolocation/ngx';
 
 @Component({
   selector: 'app-home',
@@ -106,6 +106,7 @@ export class HomePage implements OnInit {
     private navCtc: NavController,
     private sanitizer:DomSanitizer,
     private chooser:Chooser,
+    private geolaction: Geolocation
     //private picker:ImagePicker
     ) {
     this.domicilio = this.createFormGroupDomicilio();
@@ -355,6 +356,16 @@ export class HomePage implements OnInit {
     }),(err) =>{
       console.log("error");
     }
+  }
+
+  getGeolaction(){
+    this.geolaction.getCurrentPosition({
+      enableHighAccuracy:true,
+      maximumAge:0
+    }).then((res:Geoposition)=>{
+      console.log(res);
+      alert(res.coords.latitude + res.coords.longitude)
+    })
   }
 /*
   pickImage(){
