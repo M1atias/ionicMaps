@@ -10,6 +10,9 @@ import {Chooser, ChooserResult} from '@ionic-native/chooser/ngx';
 //import {ImagePicker,ImagePickerOptions} from '@ionic-native/image-picker/ngx';
 import {Geolocation, Geoposition} from  '@ionic-native/geolocation/ngx';
 import * as L from 'leaflet';
+import 'leaflet-control-geocoder';
+import * as ELG from "esri-leaflet-geocoder";
+
 
 @Component({
   selector: 'app-home',
@@ -61,10 +64,11 @@ export class HomePage implements OnInit {
   mostrarImg:string="";
   images:any[]=[];
   map:L.Map;
-  marker:any;
+  marker;
   latLong=[];
   latInicial:any;
   logInicial:any;
+  geocoder = L.Control.Geocoder.nominatim();
 
   //Formulario del domicilio
   createFormGroupDomicilio() {
@@ -375,7 +379,7 @@ export class HomePage implements OnInit {
       alert(res.coords.latitude + res.coords.longitude)
     })
   }
-
+  
   getPosition(){
     this.geolaction.getCurrentPosition({
       enableHighAccuracy:true
@@ -390,10 +394,15 @@ export class HomePage implements OnInit {
   }
 
   showMarker(latLog){
-    this.marker = L.marker(latLog,{draggable:true,bubblingMouseEvents:true});
-    this.marker.addTo(this.map).bindPopup('Im Here' + this.marker.getLatLng()).openPopup();
-    this.map.setView(latLog);
-    console.log(this.marker);
+    if(this.marker){
+      this.marker.setLatLng(this.latLong,{draggable:true,bubblingMouseEvents:true});
+      this.map.setView(latLog);
+    }else{
+      this.marker = L.marker(latLog,{draggable:true,bubblingMouseEvents:true});
+      this.marker.addTo(this.map).bindPopup('Im Here' + this.marker.getLatLng()).openPopup();
+      this.map.setView(latLog);
+      console.log(this.marker);
+    }
   }
   
 
@@ -402,15 +411,80 @@ export class HomePage implements OnInit {
     const markerJson = this.marker.toGeoJSON();
     console.log(markerJson);
   }
-
+  
   ionViewDidEnter(){
-   this.showMap();
+    this.showMap();
+   /* var control = L.Control.geocoder({
+      placeholder: 'Search here...',
+      geocoder: this.geocoder
+    }).addTo(this.map);
+    this.map.on('click', function(e) {
+      control.geocoder.reverse(e.latlng, this.map.options.crs.scale(this.map.getZoom()), function(results) {
+        var r = results[0];
+        console.log(r);
+        if (r) {
+          if (this.marker) {
+            this.marker
+              .setLatLng(r.center)
+              .setPopupContent(r.html || r.name)
+              .openPopup();
+          } else {
+            this.marker = L.marker(r.center)
+              .bindPopup(r.name)
+              .addTo(this.map)
+              .openPopup();
+          }
+        }
+      });
+    });*/
+    /*const searchControl = L.esri.Geocoding.geosearch({providers: [
+      L.esri.Geocoding.arcgisOnlineProvider({
+        // API Key to be passed to the ArcGIS Online Geocoding Service
+        apikey: 'AAPKae6f9ad40725483db012eca25c4e9edbWQWTyM50hrQAqb9KR7GsOPEcvfTXIkTybCIa5NnZSDkjl3FH3YDXDbsTYhQGtUOZ'
+      })
+    ]});
+    const results = new L.LayerGroup().addTo(this.map);
+    searchControl
+      .on("results", function (data) {
+        results.clearLayers();
+        for (let i = data.results.length - 1; i >= 0; i--) {
+          results.addLayer(L.marker(data.results[i].latlng));
+        }
+      })
+      .addTo(this.map);
+      console.log(new ELG.ReverseGeocode());
+      this.map.on("click", (e) => {
+        new ELG.ReverseGeocode().latlng(e.latlng).run((error, result) => {
+          if (error) {
+            return;
+          }
+          if (this.marker && this.map.hasLayer(this.marker))
+            this.map.removeLayer(this.marker);
+  
+          this.marker = L.marker(result.latlng)
+            .addTo(this.map)
+            .bindPopup(result.address.Match_addr)
+            .openPopup();
+        });
+      });*/
+      var _geocoderType = L.Control.Geocoder.nominatim();
+      var geocoder = L.Control.geocoder({
+        geocoder: _geocoderType
+      }).addTo(this.map);
+      geocoder.on('markgeocode', function(event) {
+        var center = event.geocode.center;
+        console.log(center);
+        L.marker(center).addTo(this.map);
+        this.map.setView(center, this.map.getZoom());
+});
   }
-
+  
   showMap(){
     this.getGeolaction();
     this.map = new L.Map('myMap').setView([-31.4172235,-64.1891788],10);
     L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png').addTo(this.map);
+    //L.Control.geocoder().addTo(this.map);
+    
   }
 
   

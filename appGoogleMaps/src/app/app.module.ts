@@ -16,6 +16,7 @@ import {Chooser} from '@ionic-native/chooser/ngx';
 //import {ImagePicker} from '@ionic-native/image-picker/ngx';
 import {Geolocation} from  '@ionic-native/geolocation/ngx';
 
+
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
