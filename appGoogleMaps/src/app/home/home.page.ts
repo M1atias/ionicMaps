@@ -9,7 +9,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import {Chooser, ChooserResult} from '@ionic-native/chooser/ngx';
 //import {ImagePicker,ImagePickerOptions} from '@ionic-native/image-picker/ngx';
 import {Geolocation, Geoposition} from  '@ionic-native/geolocation/ngx';
-import {Map, tileLayer, marker,polyline} from 'leaflet';
+import * as L from 'leaflet';
 
 @Component({
   selector: 'app-home',
@@ -60,7 +60,7 @@ export class HomePage implements OnInit {
   fileObj:ChooserResult;
   mostrarImg:string="";
   images:any[]=[];
-  map:Map;
+  map:L.Map;
   marker:any;
   latLong=[];
   latInicial:any;
@@ -390,9 +390,17 @@ export class HomePage implements OnInit {
   }
 
   showMarker(latLog){
-    this.marker = marker(latLog);
-    this.marker.addTo(this.map).bindPopup('Im Here');
+    this.marker = L.marker(latLog,{draggable:true,bubblingMouseEvents:true});
+    this.marker.addTo(this.map).bindPopup('Im Here' + this.marker.getLatLng()).openPopup();
     this.map.setView(latLog);
+    console.log(this.marker);
+  }
+  
+
+  capturedPosition(){
+    this.marker.addTo(this.map).bindPopup('Im Here' + this.marker.getLatLng()).openPopup();
+    const markerJson = this.marker.toGeoJSON();
+    console.log(markerJson);
   }
 
   ionViewDidEnter(){
@@ -401,8 +409,8 @@ export class HomePage implements OnInit {
 
   showMap(){
     this.getGeolaction();
-    this.map = new Map('myMap').setView([-31.4172235,-64.1891788],10);
-    tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png').addTo(this.map);
+    this.map = new L.Map('myMap').setView([-31.4172235,-64.1891788],10);
+    L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png').addTo(this.map);
   }
 
   
