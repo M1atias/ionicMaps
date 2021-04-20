@@ -9,6 +9,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import {Chooser, ChooserResult} from '@ionic-native/chooser/ngx';
 //import {ImagePicker,ImagePickerOptions} from '@ionic-native/image-picker/ngx';
 import {Geolocation, Geoposition} from  '@ionic-native/geolocation/ngx';
+import {Map, tileLayer, marker,polyline} from 'leaflet';
 
 @Component({
   selector: 'app-home',
@@ -59,6 +60,11 @@ export class HomePage implements OnInit {
   fileObj:ChooserResult;
   mostrarImg:string="";
   images:any[]=[];
+  map:Map;
+  marker:any;
+  latLong=[];
+  latInicial:any;
+  logInicial:any;
 
   //Formulario del domicilio
   createFormGroupDomicilio() {
@@ -364,9 +370,44 @@ export class HomePage implements OnInit {
       maximumAge:0
     }).then((res:Geoposition)=>{
       console.log(res);
+      this.latInicial = res.coords.latitude;
+      this.logInicial = res.coords.longitude;
       alert(res.coords.latitude + res.coords.longitude)
     })
   }
+
+  getPosition(){
+    this.geolaction.getCurrentPosition({
+      enableHighAccuracy:true
+    }).then((res)=>{
+      return this.latLong = [
+        res.coords.latitude,
+        res.coords.longitude
+      ]
+    }).then((latLong)=>{
+      this.showMarker(latLong);
+    })
+  }
+
+  showMarker(latLog){
+    this.marker = marker(latLog);
+    this.marker.addTo(this.map).bindPopup('Im Here');
+    this.map.setView(latLog);
+  }
+
+  ionViewDidEnter(){
+   this.showMap();
+  }
+
+  showMap(){
+    this.getGeolaction();
+    this.map = new Map('myMap').setView([-31.4172235,-64.1891788],10);
+    tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png').addTo(this.map);
+  }
+
+  
+
+
 /*
   pickImage(){
     let options:ImagePickerOptions={
