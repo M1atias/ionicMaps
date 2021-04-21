@@ -15,13 +15,13 @@ import { BackendModule } from './backend/backend.module';
 import {Chooser} from '@ionic-native/chooser/ngx';
 //import {ImagePicker} from '@ionic-native/image-picker/ngx';
 import {Geolocation} from  '@ionic-native/geolocation/ngx';
-
+import {PopovercomponentPageModule} from './popovercomponent/popovercomponent.module';
 
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule,AngularFireModule.initializeApp(environment.firebaseConfig),
-    AngularFirestoreModule,BackendModule],
+    AngularFirestoreModule,BackendModule,PopovercomponentPageModule],
   providers: [
     StatusBar,
     SplashScreen,

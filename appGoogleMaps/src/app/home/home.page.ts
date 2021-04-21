@@ -11,7 +11,9 @@ import {Chooser, ChooserResult} from '@ionic-native/chooser/ngx';
 import {Geolocation, Geoposition} from  '@ionic-native/geolocation/ngx';
 import * as L from 'leaflet';
 import 'leaflet-control-geocoder';
-import * as ELG from "esri-leaflet-geocoder";
+//import * as ELG from "esri-leaflet-geocoder";
+import {PopoverController} from '@ionic/angular';
+import {PopovercomponentPage} from '../popovercomponent/popovercomponent.page';
 
 
 @Component({
@@ -116,13 +118,20 @@ export class HomePage implements OnInit {
     private navCtc: NavController,
     private sanitizer:DomSanitizer,
     private chooser:Chooser,
-    private geolaction: Geolocation
+    private geolaction: Geolocation,
+    private popover:PopoverController
     //private picker:ImagePicker
     ) {
     this.domicilio = this.createFormGroupDomicilio();
     this.metodoPagoEfectivo = this.createFormGroupMetodoPagoEfectivo();
     this.metodoPagoTarjeta = this.createFormGroupMetodoPagoTarjeta();
     this.productoBuscar = this.createFormGroupProducto();
+  }
+
+  CreatePopover(){
+    this.popover.create({component:PopovercomponentPage,showBackdrop:true, backdropDismiss:false,componentProps:{tipoError:this.validacionImg}}).then((popoverElement)=>{
+      popoverElement.present();
+    })
   }
 
   async presentLoading() {
@@ -476,13 +485,14 @@ export class HomePage implements OnInit {
         console.log(center);
         L.marker(center).addTo(this.map);
         this.map.setView(center, this.map.getZoom());
-});
+      });
+      
   }
   
   showMap(){
     this.getGeolaction();
     this.map = new L.Map('myMap').setView([-31.4172235,-64.1891788],10);
-    L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png').addTo(this.map);
+    L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.map);
     //L.Control.geocoder().addTo(this.map);
     
   }
