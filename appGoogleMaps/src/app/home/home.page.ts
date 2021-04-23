@@ -11,7 +11,6 @@ import {Chooser, ChooserResult} from '@ionic-native/chooser/ngx';
 import {Geolocation, Geoposition} from  '@ionic-native/geolocation/ngx';
 import * as L from 'leaflet';
 import 'leaflet-control-geocoder';
-//import * as ELG from "esri-leaflet-geocoder";
 import {PopoverController} from '@ionic/angular';
 import {PopovercomponentPage} from '../popovercomponent/popovercomponent.page';
 
@@ -56,7 +55,7 @@ export class HomePage implements OnInit {
   producto = [];
   comercio;
   FormReg: FormGroup;
-  productoB: String;
+  productoB: string;
   imgURL;
   archivos:any=[];
   previsualizar:string;
@@ -68,9 +67,14 @@ export class HomePage implements OnInit {
   map:L.Map;
   marker;
   latLong=[];
+  produtosCargados:any[]=[];
   latInicial:any;
   logInicial:any;
-  geocoder = L.Control.Geocoder.nominatim();
+  hayMarkers:boolean=false;
+  _geocoderType = L.Control.Geocoder.nominatim();
+  geocoder = L.Control.geocoder({
+    geocoder: this._geocoderType
+  });
 
   //Formulario del domicilio
   createFormGroupDomicilio() {
@@ -316,12 +320,14 @@ export class HomePage implements OnInit {
         console.log(extensionArchivo);
       } else {
         this.imgValidation = true;
-        this.validacionImg = "El tamaño del archivo supera los 5 mb";
+        this.validacionImg = "El tamaño del archivo supera los 5 mb, la imagen no se guardara";
+        this.CreatePopover();
       }
     }
     else{
       this.imgValidation = true;
-      this.validacionImg = "Debe seleccionar un archivo '.jpg'";
+      this.validacionImg = "Debe seleccionar un archivo '.jpg', la imagen no se guardara";
+      this.CreatePopover();
     }
   }
 
@@ -366,11 +372,13 @@ export class HomePage implements OnInit {
           this.mostrarImg = this.fileObj.dataURI;
         }else{
           this.imgValidation = true;
-          this.validacionImg = "El tamaño del archivo supera los 5 mb";
+          this.validacionImg = "El tamaño del archivo supera los 5 mb, no se guardara la imagen";
+          this.CreatePopover();
         }
       }else{
         this.imgValidation = true;
-        this.validacionImg = "Debe seleccionar un archivo '.jpg'";
+        this.validacionImg = "Debe seleccionar un archivo '.jpg', no se guardara la imagen";
+        this.CreatePopover();
       }
     }),(err) =>{
       console.log("error");
@@ -403,6 +411,8 @@ export class HomePage implements OnInit {
   }
 
   showMarker(latLog){
+    this.map.remove();
+    this.showMap2();
     if(this.marker){
       this.marker.setLatLng(this.latLong,{draggable:true,bubblingMouseEvents:true});
       this.map.setView(latLog);
@@ -423,78 +433,88 @@ export class HomePage implements OnInit {
   
   ionViewDidEnter(){
     this.showMap();
-   /* var control = L.Control.geocoder({
-      placeholder: 'Search here...',
-      geocoder: this.geocoder
-    }).addTo(this.map);
-    this.map.on('click', function(e) {
-      control.geocoder.reverse(e.latlng, this.map.options.crs.scale(this.map.getZoom()), function(results) {
-        var r = results[0];
-        console.log(r);
-        if (r) {
-          if (this.marker) {
-            this.marker
-              .setLatLng(r.center)
-              .setPopupContent(r.html || r.name)
-              .openPopup();
-          } else {
-            this.marker = L.marker(r.center)
-              .bindPopup(r.name)
-              .addTo(this.map)
-              .openPopup();
-          }
-        }
-      });
-    });*/
-    /*const searchControl = L.esri.Geocoding.geosearch({providers: [
-      L.esri.Geocoding.arcgisOnlineProvider({
-        // API Key to be passed to the ArcGIS Online Geocoding Service
-        apikey: 'AAPKae6f9ad40725483db012eca25c4e9edbWQWTyM50hrQAqb9KR7GsOPEcvfTXIkTybCIa5NnZSDkjl3FH3YDXDbsTYhQGtUOZ'
-      })
-    ]});
-    const results = new L.LayerGroup().addTo(this.map);
-    searchControl
-      .on("results", function (data) {
-        results.clearLayers();
-        for (let i = data.results.length - 1; i >= 0; i--) {
-          results.addLayer(L.marker(data.results[i].latlng));
-        }
-      })
-      .addTo(this.map);
-      console.log(new ELG.ReverseGeocode());
-      this.map.on("click", (e) => {
-        new ELG.ReverseGeocode().latlng(e.latlng).run((error, result) => {
-          if (error) {
-            return;
-          }
-          if (this.marker && this.map.hasLayer(this.marker))
-            this.map.removeLayer(this.marker);
-  
-          this.marker = L.marker(result.latlng)
-            .addTo(this.map)
-            .bindPopup(result.address.Match_addr)
-            .openPopup();
-        });
-      });*/
-      var _geocoderType = L.Control.Geocoder.nominatim();
-      var geocoder = L.Control.geocoder({
-        geocoder: _geocoderType
-      }).addTo(this.map);
-      geocoder.on('markgeocode', function(event) {
-        var center = event.geocode.center;
-        console.log(center);
-        L.marker(center).addTo(this.map);
-        this.map.setView(center, this.map.getZoom());
-      });
-      
   }
-  
+  /*  cargarPedido() {
+    let vueltas = Math.floor(Math.random() * 5);
+    for (let index = 0; index < vueltas; index++) {
+      let indice = Math.floor(Math.random() * 7);
+      let cantidadPedida = Math.floor(Math.random() * 4);
+      if (cantidadPedida == 0) {
+        cantidadPedida = 1
+      }
+      //Por cada producto que pertenece al pedido generado se crea un ion-card
+      const ionCard = document.createElement('ion-card');
+      const nuevoProducto = document.createElement('ion-card-content');
+      nuevoProducto.textContent = "(" + "X " + cantidadPedida + ")  " + this.producto[indice].nombre + ": " + "$" + this.producto[indice].precio;
+      ionCard.appendChild(nuevoProducto);
+      ionCard.setAttribute("class","animate__animated animate__pulse");
+      //Ademas se bloquea el botón para agregar pedidos y se habilita el botón para eliminar el pedido cargado previamente
+      let buttonCargarPedido = document.querySelector('#mostrarPedido');
+      let iconoButton = document.querySelector('#icono');
+      iconoButton.setAttribute("name", "trash-outline");
+      iconoButton.setAttribute("color", "danger");
+      buttonCargarPedido.setAttribute("name", "borrarPedido");
+      let productList = document.querySelector('#productList');
+      productList.appendChild(ionCard);
+      this.precio += cantidadPedida * this.producto[indice].precio;
+    }
+    this.calcularCostoTotal(this.precio);
+  }*/ 
+  cargarProducto(){
+    console.log(this.produtosCargados.length);
+    let vueltas = this.produtosCargados.length;
+    for (let index = 0; index <= vueltas; index++) {
+      const ionItem = document.createElement('ion-item');
+      const img = document.createElement('img');
+      const ionAvatar = document.createElement('ion-avatar');
+      const nuevoProducto = document.createElement('ion-label');
+      nuevoProducto.textContent = this.productoB;
+      this.mostrarImg = this.previsualizar;
+      if (this.mostrarImg) {
+        img.setAttribute("src",this.mostrarImg);
+        img.setAttribute("width","50px");
+        img.setAttribute("margin-left","50px");
+        img.setAttribute("border","10px");
+      }
+      ionAvatar.setAttribute("slot","end");
+      ionAvatar.appendChild(img);
+      //nuevoProducto.appendChild(ionAvatar);
+      ionItem.appendChild(nuevoProducto);
+      ionItem.appendChild(img);
+      let list = document.querySelector('#listaProductosACargar');
+      list.appendChild(ionItem);
+    }
+  }
+  showMap2(){
+    this.getGeolaction();
+    this.map = new L.Map('myMap').setView([-31.4172235,-64.1891788],14);
+    L.tileLayer('assets/mapa/{z}/{x}/{y}.png').addTo(this.map);
+    this.geocoder.addTo(this.map);
+  }
+
   showMap(){
     this.getGeolaction();
-    this.map = new L.Map('myMap').setView([-31.4172235,-64.1891788],10);
-    L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.map);
-    //L.Control.geocoder().addTo(this.map);
-    
+    this.map = new L.Map('myMap').setView([-31.4172235,-64.1891788],14);
+    L.tileLayer('assets/mapa/{z}/{x}/{y}.png').addTo(this.map);
+    this.geocoder.addTo(this.map);
+    var cen;
+    this.geocoder.on('markgeocode', function(event) {
+        var center = event.geocode.center;
+        cen = center;
+        console.log(center);
+        console.log(cen);
+        //L.marker(center,{draggable:true,bubblingMouseEvents:true}).addTo(mapa);
+        //mapa.setView(center, mapa.getZoom());
+        //this.showMarker(center);
+        //L.Control.geocoder().addTo(this.map);
+      });
+      //this.showMarker(cen);
+      /*this.map.remove();
+      this.showMap2();
+      this.marker = L.marker(cen,{draggable:true,bubblingMouseEvents:true}).addTo(this.map);
+      this.marker.addTo(this.map).bindPopup('Im Here' + this.marker.getLatLng()).openPopup();
+      this.map.setView(cen);
+      this.hayMarkers = true;      */
   }
 
   

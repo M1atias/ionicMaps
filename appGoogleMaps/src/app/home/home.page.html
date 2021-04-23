@@ -66,15 +66,6 @@
                 </div>
             </ion-item>
             <ion-item>
-                <input (change)="capturarFoto($event)" type="file" accept=".jpg,jpeg">
-                <div *ngIf="previsualizar">
-                    <img width="100px" [src]="previsualizar">
-                </div>
-                <ng-container *ngIf="imgValidation === true">
-                    {{validacionImg}}
-                </ng-container>
-            </ion-item>
-            <ion-item>
                 <ion-button (click)="pickFile()">
                     Pick File
                 </ion-button>
@@ -85,6 +76,25 @@
                     {{validacionImg}}
                 </ng-container>
                 <ion-button (click)="CreatePopover()">Open Popover</ion-button>
+            </ion-item>
+            <div *ngIf="this.productoBuscar.valid">
+                <ion-button style="text-align: center;" expand="block" fill="outline" color="success" (click)="cargarProducto()">Cargar producto</ion-button>
+                <ion-row>
+                    <ion-col size-md="4" offset-md="4">
+                        <ion-list id="listaProductosACargar">
+    
+                        </ion-list>
+                    </ion-col>
+                </ion-row>
+            </div>
+            <ion-item>
+                <input (change)="capturarFoto($event)" type="file" accept=".jpg,jpeg">
+                <div *ngIf="previsualizar">
+                    <img width="100px" [src]="previsualizar">
+                </div>
+                <ng-container *ngIf="imgValidation === true">
+                    {{validacionImg}}
+                </ng-container>
             </ion-item>
           <!--  <ion-item>
                 <ion-button (click)="pickImage()">
@@ -398,3 +408,5 @@
         Here
     </ion-button>
 </ion-content>
+
+
